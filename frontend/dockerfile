@@ -1,0 +1,22 @@
+# Using Node 22 (Latest Stable for 2026)
+FROM node:22
+
+WORKDIR /app
+
+# Copy package files first
+COPY package*.json ./
+
+# Use legacy-peer-deps to solve version conflicts between Vite 8 and React 19
+RUN npm install --legacy-peer-deps
+
+# Copy the rest of the source code
+COPY . .
+
+# Build the production assets
+RUN npm run build
+
+# Install a server to host the static files
+RUN npm install -g serve
+
+# Listen on the dynamic port provided by Cloud Run
+CMD serve -s dist -l $PORT
