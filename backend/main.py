@@ -4,7 +4,7 @@ import shutil
 import os
 from model import get_embedding
 from similarity import find_best_match, classify
-from database import save_fingerprint
+from database import save_fingerprint, get_vector_matrix
 
 app = FastAPI(title="Media Fingerprinting API")
 print("🚀 MediaGuard Backend is starting up...")
@@ -79,6 +79,14 @@ async def scan_url(url: str):
         "score": float(best_score),
         "matched_with": best_match if best_match else "None"
     }
+
+@app.get("/assets")
+async def list_assets():
+    """
+    Returns a list of all registered asset names.
+    """
+    _, names = get_vector_matrix()
+    return {"assets": names}
 
 @app.get("/health")
 async def health():

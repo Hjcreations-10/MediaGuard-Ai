@@ -4,22 +4,16 @@ import requests
 from io import BytesIO
 import os
 
-# global variable to hold the model
-_MODEL = None
+# Pre-load the model at startup to avoid "Cold Start" delay on first request
+print("🚀 Initializing CLIP Neural Network model...")
+_MODEL = SentenceTransformer('clip-ViT-B-32')
+print("✅ CLIP Model ready!")
 
 def get_embedding(image_path_or_url):
     """
     Generates a 512-dimensional embedding for an image using CLIP.
-    Loads the model lazily on first request to speed up container startup.
     """
-    global _MODEL
-    
     try:
-        if _MODEL is None:
-            print("Lazy loading CLIP model (first request)...")
-            _MODEL = SentenceTransformer('clip-ViT-B-32')
-            print("Model loaded successfully!")
-
         if image_path_or_url.startswith(('http://', 'https://')):
             response = requests.get(image_path_or_url, timeout=10)
             img = Image.open(BytesIO(response.content))
